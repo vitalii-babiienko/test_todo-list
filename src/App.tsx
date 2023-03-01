@@ -1,34 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { FC, useState } from 'react';
+import { useLocalStorage } from './app/hooks';
+import { TodoForm } from './components/TodoForm';
+import { TodoList } from './components/TodoList';
+import { TodoModal } from './components/TodoModal';
+import './styles/App.css'
+import { Todo } from './types/Todo';
 
-function App() {
-  const [count, setCount] = useState(0)
+export const App: FC = () => {
+  const [todos, setTodos] = useLocalStorage<Todo[]>('todos', []);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
-}
+    <>
+      <div className="app">
+        <div className="app__content">
+          <TodoForm
+            todos={todos}
+            setTodos={setTodos}
+          />
 
-export default App
+          <div className="block">
+            <TodoList
+              todos={todos}
+              setTodos={setTodos}
+              selectedTodo={selectedTodo}
+              setSelectedTodo={setSelectedTodo}
+            />
+          </div>
+        </div>
+      </div>
+
+      {selectedTodo && (
+        <TodoModal
+          todo={selectedTodo}
+          selectedTodo={selectedTodo}
+          setSelectedTodo={setSelectedTodo}
+        />
+      )}
+    </>
+  )
+};
+
+export default App;

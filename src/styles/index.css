@@ -1,0 +1,10 @@
+iframe {
+  display: none;
+}
+
+body {
+  min-width: 500px;
+  max-width: 768px;
+  margin: 50px auto 0;
+  background-color: #f1eaea;
+}
