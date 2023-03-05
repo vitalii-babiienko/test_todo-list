@@ -5,8 +5,7 @@ Test task "To-Do List".
 
 # Technologies used
 
-- React
 - TypeScript
-- JavaScript
+- React
 - HTML
 - CSS

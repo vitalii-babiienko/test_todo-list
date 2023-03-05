@@ -1,39 +1,20 @@
-import { FC, memo, useCallback } from 'react';
+import { FC, memo } from 'react';
 import { Todo } from '../../types/Todo';
+import { TodoItem } from '../TodoItem';
 
 interface Props {
   todos: Todo[];
   setTodos: (value: Todo[]) => void;
-  selectedTodo: Todo | null;
   setSelectedTodo: React.Dispatch<React.SetStateAction<Todo | null>>;
+  handleStatusChange: (todoId: number, completed: boolean) => void;
 }
 
 export const TodoList: FC<Props> = memo(({
   todos,
   setTodos,
-  selectedTodo,
   setSelectedTodo,
+  handleStatusChange,
 }) => {
-  const handleShowModal = useCallback((targetTodo: Todo) => {
-    setSelectedTodo(targetTodo);
-  }, [selectedTodo]);
-
-  const handleStatusChange = useCallback((todoId: number, completed: boolean) => {
-    const filteredTodos = todos.map((todo) => (
-      todo.id !== todoId ? todo : {...todo, completed: !completed}
-    ));
-
-    setTodos(filteredTodos);
-  }, [todos]);
-
-  const handleRemove = useCallback((todoId: number) => {
-    setTodos(todos.filter(({ id }) => id !== todoId));
-  }, [todos]);
-
-  const cutOffExcess = useCallback((str: string) => (
-    str.length > 20 ? str.slice(0, 20) + '...' : str
-  ), []);
-
   return (
     <table className="table">
       <thead>
@@ -65,44 +46,15 @@ export const TodoList: FC<Props> = memo(({
       </thead>
 
       <tbody>
-        {todos.map(({
-          id,
-          title,
-          description,
-          completed,
-        }) => (
-          <tr
-            key={id}
-            className="tbody-row"
-          >
-            <td>{id}</td>
-            <td>{cutOffExcess(title)}</td>
-            <td>{cutOffExcess(description)}</td>
-            <td>
-              <button
-                type="button"
-                className="open-modal-button"
-                onClick={() => handleShowModal({id, title, description, completed})}
-              >
-                See details
-              </button>
-
-              <input
-                type="checkbox"
-                className="status-input"
-                checked={completed}
-                onChange={() => handleStatusChange(id, completed)}
-              />
-
-              <button
-                type="button"
-                className="remove-button"
-                onClick={() => handleRemove(id)}
-              >
-                x
-              </button>
-            </td>
-          </tr>
+        {todos.map((todo) => (
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            todos={todos}
+            setTodos={setTodos}
+            handleStatusChange={handleStatusChange}
+            setSelectedTodo={setSelectedTodo}
+          />
         ))}
       </tbody>
     </table>

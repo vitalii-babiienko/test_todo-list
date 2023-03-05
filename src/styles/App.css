@@ -53,6 +53,12 @@
   background-color: #d8c1c1;
 }
 
+.table td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .status-input {
   margin: 0 10px;
 }
@@ -61,15 +67,14 @@
   position: relative;
   top: -3px;
   border: 0;
-  border-radius: 50%;
-  background-color: #c3bdbd;
+  background: none;
   cursor: pointer;
   color: #d63e3e;
   opacity: 0;
-  transition: opacity 0.2s ease-out;
+  transition: color 0.2s ease-out;
 }
 
-.remove-button:hover {
+.tbody-row:hover .remove-button {
   opacity: 1;
 }
 

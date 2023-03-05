@@ -3,9 +3,10 @@ import {
   memo,
   useCallback,
   useRef,
-  useState
+  useState,
 } from 'react';
 
+import { ErrorType } from '../../types/ErrorType';
 import { Todo } from '../../types/Todo';
 
 interface Props {
@@ -17,55 +18,49 @@ export const TodoForm: FC<Props> = memo(({
   todos,
   setTodos,
 }) => {
-  const [title, setTitle] = useState('');
-  const [isTitle, setIsTitle] = useState(true);
-  const [description, setDescription] = useState('');
-  const [isDescription, setIsDescription] = useState(true);
-  const titleInput = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<ErrorType | null>(null);
+  const inputTitle = useRef<HTMLInputElement>(null);
 
-  const handleTitleChange = useCallback((value: string) => {
-    setTitle(value);
-    setIsTitle(true);
-  }, [title]);
-
-  const handleDescriptionChange = useCallback((value: string) => {
-    setDescription(value);
-    setIsDescription(true);
-  }, [description]);
+  const isTitleFieldEmpty = error === ErrorType.Title;
+  const isDescriptionFieldEmpty = error === ErrorType.Description;
 
   const handleFormSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!title.trim()) {
-      setIsTitle(false);
+    const target = e.target as HTMLFormElement;
+    const todoTitle: string = target.todoTitle.value;
+    const todoDescription: string = target.todoDescription.value;
+
+    if (!todoTitle.trim()) {
+      setError(ErrorType.Title);
 
       return;
     }
 
-    if (!description.trim()) {
-      setIsDescription(false);
+    if (!todoDescription.trim()) {
+      setError(ErrorType.Description);
 
       return;
     }
 
-    if (isTitle && isDescription) {
+    if (todoTitle && todoDescription) {
       const newTodo: Todo = {
         id: +new Date(),
-        title,
-        description,
+        title: todoTitle,
+        description: todoDescription,
         completed: false,
       };
-
+  
       setTodos([...todos, newTodo]);
-      setTitle('');
-      setDescription('');
-
-      if (titleInput.current) {
-        titleInput.current.focus();
+      setError(null);
+  
+      target.reset();
+  
+      if (inputTitle.current) {
+        inputTitle.current.focus();
       };
     }
-
-  }, [title, description]);
+  }, [todos]);
 
   return (
     <form
@@ -80,16 +75,15 @@ export const TodoForm: FC<Props> = memo(({
         <input
           type="text"
           id="todo-title"
-          ref={titleInput}
-          className={`input ${!isTitle ? "is-error" : ""}`}
+          name="todoTitle"
+          className={`input ${isTitleFieldEmpty ? "is-error" : ""}`}
           placeholder="Enter title"
-          value={title}
-          onChange={e => handleTitleChange(e.target.value)}
+          ref={inputTitle}
         />
 
-        {!isTitle && (
+        {isTitleFieldEmpty && (
           <span className="error">
-            The title field can't be empty
+            {ErrorType.Title}
           </span>
         )}
       </div>
@@ -102,22 +96,21 @@ export const TodoForm: FC<Props> = memo(({
         <input
           type="text"
           id="todo-description"
-          className={`input ${!isDescription ? "is-error" : ""}`}
+          name="todoDescription"
+          className={`input ${isDescriptionFieldEmpty ? "is-error" : ""}`}
           placeholder="Enter description"
-          value={description}
-          onChange={e => handleDescriptionChange(e.target.value)}
         />
 
-        {!isDescription && (
+        {isDescriptionFieldEmpty && (
           <span className="error">
-            The description field can't be empty
+            {ErrorType.Description}
           </span>
         )}
       </div>
 
       <button
-        className="button"
         type="submit"
+        className="button"
       >
         Create
       </button>

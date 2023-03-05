@@ -1,26 +1,32 @@
-import { FC, memo, useCallback } from 'react';
+import {
+  FC,
+  memo,
+  useCallback,
+} from 'react';
+
 import { Todo } from '../../types/Todo';
 
 interface Props {
-  todo: Todo;
   selectedTodo: Todo;
   setSelectedTodo: React.Dispatch<React.SetStateAction<Todo | null>>;
+  handleStatusChange: (todoId: number, completed: boolean) => void;
 }
 
 export const TodoModal: FC<Props> = memo(({
-  todo,
   selectedTodo,
   setSelectedTodo,
+  handleStatusChange,
 }) => {
   const {
+    id,
     title,
     description,
     completed,
-  } = todo;
+  } = selectedTodo;
 
-  const onClose = useCallback((todo: Todo | null) => {
-    setSelectedTodo(todo);
-  }, [selectedTodo]);
+  const onClose = useCallback(() => {
+    setSelectedTodo(null);
+  }, []);
 
   return (
     <div className="modal">
@@ -37,13 +43,15 @@ export const TodoModal: FC<Props> = memo(({
           Status:
           <input
             type="checkbox"
+            className="status-input"
             checked={completed}
+            onChange={(e) => handleStatusChange(id, e.target.checked)}
           />
         </p>
 
         <button
           type="button"
-          onClick={() => onClose(null)}
+          onClick={onClose}
         >
           Close
         </button>

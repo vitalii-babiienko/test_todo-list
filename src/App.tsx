@@ -1,14 +1,31 @@
-import { FC, useState } from 'react';
+import {
+  FC,
+  useState,
+  useCallback,
+} from 'react';
+
 import { useLocalStorage } from './app/hooks';
 import { TodoForm } from './components/TodoForm';
 import { TodoList } from './components/TodoList';
 import { TodoModal } from './components/TodoModal';
-import './styles/App.css'
+import './styles/App.css';
 import { Todo } from './types/Todo';
 
 export const App: FC = () => {
   const [todos, setTodos] = useLocalStorage<Todo[]>('todos', []);
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+
+  const handleStatusChange = useCallback((todoId: number, completed: boolean) => {
+    const filteredTodos = todos.map((todo) => (
+      todo.id !== todoId ? todo : {...todo, completed}
+    ));
+
+    if (selectedTodo) {
+      setSelectedTodo({...selectedTodo, completed});
+    }
+
+    setTodos(filteredTodos);
+  }, [todos, selectedTodo]);
 
   return (
     <>
@@ -23,8 +40,8 @@ export const App: FC = () => {
             <TodoList
               todos={todos}
               setTodos={setTodos}
-              selectedTodo={selectedTodo}
               setSelectedTodo={setSelectedTodo}
+              handleStatusChange={handleStatusChange}
             />
           </div>
         </div>
@@ -32,9 +49,9 @@ export const App: FC = () => {
 
       {selectedTodo && (
         <TodoModal
-          todo={selectedTodo}
           selectedTodo={selectedTodo}
           setSelectedTodo={setSelectedTodo}
+          handleStatusChange={handleStatusChange}
         />
       )}
     </>
